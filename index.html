@@ -1,0 +1,269 @@
+<!doctype html>
+<html ng-app="app">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, minimal-ui">
+    <meta name="format-detection" content="telephone=no">
+    <title>reader</title>
+    <link rel="stylesheet" href="css/reset.css">
+    <style>
+        html{
+            width:100%;
+            height: 100%;
+            overflow-x: hidden;
+        }
+        body{
+            text-align: left;
+            width:100%;
+            overflow: hidden;
+            background: #e9dfc7;
+        }
+        /*主体内容结构的样式设置*/
+        .m-read-content{
+            font-size: 14px;    /*设置字体大小*/
+            color: #555;        /*设置字体颜色*/
+            line-height: 31px;  /*设置行高*/
+            padding: 15px;      /*设置字体边距*/
+        }
+        .m-read-content h4{     /*设置标题样式*/
+            font-size: 20px;
+            color: #736357;
+            border-bottom: 1px solid #736357;
+            letter-spacing:2px; /*设置字符的间距*/
+            margin:0 0 1em 0;   /*设置标题与内容的距离*/
+        }
+        .m-read-content p{      /*设置段落的样式*/
+            text-indent: 2em;   /*段落缩进*/
+            margin:0.5em 0;     /*设置段落与段落之间的距离*/
+            letter-spacing: 0;
+            line-height:24px;
+        }
+        .u-tab{                        /*设置翻页按钮的样式*/
+            height:34px;
+            margin: 10px auto;         /*设置与内容之间的距离,左右居中*/
+            line-height: 34px;         /*值与height一样，实现文字的垂直居中*/
+            border-radius: 8px;        /*设置圆角边框*/
+            border:1px solid #858382;  /*设置边框样式*/
+            font-size: 12px;           /*设置字号*/
+            background: #000;          /*设置背景颜色*/
+            opacity: 0.9;              /*设置透明度*/
+        }
+        .u-tab li{
+            display: inline-block;
+            width:49%;
+            border-right:1px solid #858382;  /*按钮之间有距离*/
+            text-align: center;              /*设置字体居中显示*/
+            color: #fff;                     /*设置字体颜色*/
+        }
+        .u-tab li:nth-child(2){              /*设置第二个按钮没有白色线的间隔*/
+            border-right:none;
+        }
+        .m-button-bar{                       /*设置按钮父级的样式（解决按钮太大的问题）*/
+            width:70%;
+            max-width:800px;                 /*设置最大宽度*/
+            padding:5px;
+            margin:0 auto;                   /*设置居中*/
+        }
+
+        /*上边栏样式设置*/
+        .top-nav{
+            position: fixed; /*设置定位*/
+            top:0;
+            height:50px;
+            width:100%;
+            z-index: 9999;
+            background: #000;
+        }
+        .icon-back{
+            position: absolute;
+            top:14px;
+            left:10px;
+            width:23px;
+            height:23px;
+            background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAYAAACOEfKtAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyNpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuNS1jMDE0IDc5LjE1MTQ4MSwgMjAxMy8wMy8xMy0xMjowOToxNSAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENDIChNYWNpbnRvc2gpIiB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOkJGMkEyQkQxMjdBNDExRTU4NjA2QTJDMjFDQ0I0ODhEIiB4bXBNTTpEb2N1bWVudElEPSJ4bXAuZGlkOkJGMkEyQkQyMjdBNDExRTU4NjA2QTJDMjFDQ0I0ODhEIj4gPHhtcE1NOkRlcml2ZWRGcm9tIHN0UmVmOmluc3RhbmNlSUQ9InhtcC5paWQ6QkYyQTJCQ0YyN0E0MTFFNTg2MDZBMkMyMUNDQjQ4OEQiIHN0UmVmOmRvY3VtZW50SUQ9InhtcC5kaWQ6QkYyQTJCRDAyN0E0MTFFNTg2MDZBMkMyMUNDQjQ4OEQiLz4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz4Ia560AAAHWklEQVR42uyd7W9U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);
+            background-size:contain;
+        }
+    .nav-title{
+        position: absolute;
+        top:16px;
+        left:42px;
+        color: #d5d5d6;
+    }
+
+    /*!*底部栏样式*!
+    .footer{
+        position: absolute;
+        background: #000;
+        width:100%;
+        height:75px;
+    }
+    .icon-container{
+
+    }*/
+
+
+    /*底部栏控制面板样式设置*/
+    .nav-pannel-bg{
+        position: fixed; /*固定在底部*/
+        bottom:70px; /*距离底部边距*/
+        height:135px;
+        width:100%;
+        background: #000;
+        opacity:0.9;
+        z-index: 10000;
+    }
+    .nav-pannel{
+        position: fixed;
+        bottom:70px;
+        height:135px;
+        width:100%;
+        color: #fff;
+        z-index: 10001;
+    }
+    .child-mod{
+        padding:5px 10px;
+        margin: 15px;
+    }
+    .child-mod span{
+        display: inline-block;
+        padding-right: 20px;
+        padding-left: 10px;
+    }
+    /*设置字号选项的样式*/
+    .font-size-button{               /*设置大小按钮的样式*/
+        background: none;            /*去掉默认的背景色*/
+        border:1px solid #8c8c8c;
+        color: #fff;
+        border-radius: 16px;
+        padding:5px 40px;            /*两个按钮之间有间距*/
+    }
+    .child-mod button:nth-child(2){  /*设置第二个（小）按钮样式*/
+        margin-right: 10px;
+    }
+    /*设置背景选项样式*/
+    .bg-container{
+        position: relative;
+        width:30px;
+        height:30px;
+        border-radius: 15px;
+        background: #fff;
+        display: inline-block;      /*排成一行*/
+        vertical-align: -14px;       /*设置圆圈垂直对齐*/
+    }
+    .bg-container-current{
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        border-radius:16px;
+        border: 1px solid #e9dfc7; /*#e9dfc7;  #ff7880*/
+        display: inline-block;
+        top:-1px;                   /*调整位置*/
+        left:-1px;
+    }
+
+
+
+
+    </style>
+
+</head>
+
+<body>
+
+    <div id="root" class="container">
+        <!--顶部栏-->
+        <div id="top-nav" class="top-nav">
+            <div class="icon-back"></div>
+            <div class="nav-title">返回书架</div>
+        </div>
+
+        <div id="fiction-chapter-title"></div>
+
+        <!--主体内容-->
+        <div id="fiction-container" class="m-read-content">
+            <h4>第一章 测试斗之力</h4>
+            <p>“斗之力，三段！”</p>
+            <p>望着测验魔石碑上面闪亮得甚至有些刺眼的五个大字，少年面无表情，唇角有着一抹自嘲，紧握的手掌，因为大力
+                ，而导致略微尖锐的指甲深深的刺进了掌心之中，带来一阵阵钻心的疼痛…</p>
+            <p>“萧炎，斗之力，三段！级别：低级！”测验魔石碑之旁，一位中年男子，看了一眼碑上所显示出来的信息，语气漠
+                然的将之公布了出来…</p>
+            <p>中年男子话刚刚脱口，便是不出意外的在人头汹涌的广场上带起了一阵嘲讽的骚动。</p>
+            <p>“三段？嘿嘿，果然不出我所料，这个“天才”这一年又是在原地踏步！”</p>
+            <p>“哎，这废物真是把家族的脸都给丢光了。”</p>
+            <p>“要不是族长是他的父亲，这种废物，早就被驱赶出家族，任其自生自灭了，哪还有机会待在家族中白吃白喝。”</p>
+            <p>“唉，昔年那名闻乌坦城的天才少年，如今怎么落魄成这般模样了啊？”</p>
+            <p>“谁知道呢，或许做了什么亏心事，惹得神灵降怒了吧…”</p>
+            <p>周围传来的不屑嘲笑以及惋惜轻叹，落在那如木桩待在原地的少年耳中，恍如一根根利刺狠狠的扎在心脏一般，让
+                得少年呼吸微微急促。</p>
+            <p>少年缓缓抬起头来，露出一张有些清秀的稚嫩脸庞，漆黑的眸子木然的在周围那些嘲讽的同龄人身上扫过，少年嘴
+                角的自嘲，似乎变得更加苦涩了。</p>
+            <p>“这些人，都如此刻薄势力吗？或许是因为三年前他们曾经在自己面前露出过最谦卑的笑容，所以如今想要讨还回
+                去吧…”苦涩的一笑，萧炎落寞的转身，安静的回到了队伍的最后一排，孤单的身影与周围的世界有些格格不入</p>
+            <p>“下一个，萧媚！”</p>
+            <p>听着测验人的喊声，一名少女快速的人群中跑出，少女刚刚出场，附近的议论声便是小了许多，一双双略微火热的
+            目光，牢牢的锁定着少女的脸颊…</p>
+            <p>少女年龄不过十四左右，虽然并算不上绝色，不过那张稚气未脱的小脸，却是蕴含着淡淡的妩媚，清纯与妩媚，矛
+                盾的集合，让得她成功的成为了全场瞩目的焦点…</p>
+        </div>
+
+        <!--内容区域底部的翻页按钮-->
+        <div class="m-button-bar">
+            <ul class="u-tab">
+                <li id="prev-button">上一页</li>
+                <li id="next-button">下一页</li>
+            </ul>
+        </div>
+
+        <!--&lt;!&ndash;底部栏&ndash;&gt;
+        <div class="footer">
+            <div class="nav-bottom-bar">
+                <div class="icon-container">
+                    <div class="icon-container-content"></div>
+                    <div class="icon-container-font"></div>
+                    <div class="icon-container-night"></div>
+                    <div class="icon-container-day_and_nigth">
+                        <div class="icon-container-day"></div>
+                        <div class="icon-container-night"></div>
+                    </div>
+                </div>
+                <div class="font-container">
+                    <div class="font-container-content">目录</div>
+                    <div class="font-container-font">字体</div>
+                    <div class="font-container-day_and_nigth">
+                        <div class="font-container-day">白天</div>
+                        <div class="font-container-night">夜晚</div>
+                    </div>
+
+                </div>
+            </div>
+        </div>-->
+
+
+        <!--底部栏控制面板-->
+        <div class="nav-pannel-bg"></div>
+        <div class="nav-pannel" id="font-container">
+            <div class="child-mod">
+                <span>字号</span>
+                <button id="large-font" class="font-size-button">大</button>
+                <button id="small-font" class="font-size-button">小</button>
+            </div>
+            <div class="child-mod">
+                <span>背景</span>
+                <div class="bg-container">
+                    <div class="bg-container-current"></div>
+                    <div class="bg-container-green"></div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <srcipt src="lib/zepto.min.js"></srcipt>
+    <script>
+        window.jQuery = $;
+    </script>
+    <script src="js/jquery.base64.js"></script>
+    <script src="js/jquery.jsonp.jsj"></script>
+
+</body>
+</html>
