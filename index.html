@@ -161,9 +161,6 @@
         left:-1px;
     }
 
-
-
-
     </style>
 
 </head>
@@ -171,8 +168,13 @@
 <body>
 
     <div id="root" class="container">
+
+        <div class="m-artical-action">
+            <div class="artical-action-mid"></div>
+        </div>
+
         <!--顶部栏-->
-        <div id="top-nav" class="top-nav">
+        <div id="top-nav" class="top-nav" style="display: none">
             <div class="icon-back"></div>
             <div class="nav-title">返回书架</div>
         </div>
@@ -214,34 +216,10 @@
             </ul>
         </div>
 
-        <!--&lt;!&ndash;底部栏&ndash;&gt;
-        <div class="footer">
-            <div class="nav-bottom-bar">
-                <div class="icon-container">
-                    <div class="icon-container-content"></div>
-                    <div class="icon-container-font"></div>
-                    <div class="icon-container-night"></div>
-                    <div class="icon-container-day_and_nigth">
-                        <div class="icon-container-day"></div>
-                        <div class="icon-container-night"></div>
-                    </div>
-                </div>
-                <div class="font-container">
-                    <div class="font-container-content">目录</div>
-                    <div class="font-container-font">字体</div>
-                    <div class="font-container-day_and_nigth">
-                        <div class="font-container-day">白天</div>
-                        <div class="font-container-night">夜晚</div>
-                    </div>
-
-                </div>
-            </div>
-        </div>-->
-
 
         <!--底部栏控制面板-->
-        <div class="nav-pannel-bg"></div>
-        <div class="nav-pannel" id="font-container">
+        <div class="nav-pannel-bg" style="display: none"></div>
+        <div class="nav-pannel" id="font-container" style="display: none">
             <div class="child-mod">
                 <span>字号</span>
                 <button id="large-font" class="font-size-button">大</button>
@@ -251,9 +229,42 @@
                 <span>背景</span>
                 <div class="bg-container">
                     <div class="bg-container-current"></div>
-                    <div class="bg-container-green"></div>
+                </div>
+                <div class="bg-container">
+                    <div class="bg-container-current"></div>
+                </div>
+                <div class="bg-container">
+                    <div class="bg-container-current"></div>
                 </div>
             </div>
+        </div>
+
+         <!--底部栏-->
+         <div class="button-nav-bk button_nav" style="display: none"></div>
+
+        <div class="button-nav button_nav" style="display: none">
+            <div class="item menu-button">
+                <div class="item-wrap">
+                    <div class="icon-menu"></div>
+                    <div class="icon-text">目录</div>
+                </div>
+            </div>
+            <div class="item font-button">
+                <div class="item-wrap">
+                    <div class="icon-ft"></div>
+                    <div class="icon-text">字体</div>
+                </div>
+            </div>
+            <div class="item" id="night-button">
+                <div class="item-wrap">
+                    <div class="icon-day"></div>
+                    <div class="icon-text">白天</div>
+                </div>
+                <div class="item-wrap">
+                    <div class="icon-night"></div>
+                    <div class="icon-text">夜晚</div>
+                </div>
+            </div>   
         </div>
 
     </div>
@@ -264,6 +275,44 @@
     </script>
     <script src="js/jquery.base64.js"></script>
     <script src="js/jquery.jsonp.jsj"></script>
+    <script>
+        (function(){
+            var Util =( function(){ //声明一个内部类
+                //封装本地存储
+                var prefix = 'html5_reader_'
+                var StorageGetter = function(key){
+                    return localStorage.getItem(prefix + key);
+                }
+                var StorageSetter = function(key, val){
+                    return localStorage.setItem(prefix + key, val);
+                }
+                return{
+                    StorageGetter:StorageGetter,
+                    StorageSetter:StorageSetter
+                }
+            })();
+
+            //代码层次分离
+           function main(){
+               //todo 整个项目的入口函数
+           }
+
+           function ReaderModel(){
+                //todo 实现和阅读器相关的数据交互的方法
+            }
+
+            function ReaderBaseFrame(){
+                //todo 渲染基本的UI结构
+            }
+
+            function EventHandler(){
+                //todo 交互的事件绑定
+            }
+
+            main();
+
+        })();
+    </script>
 
 </body>
 </html>
