@@ -31,5 +31,15 @@ htmL5 + CSS实现阅读器的前端页面基本结构静态布局，主要：顶
     页面前端交互代码开发：
 
     实现和阅读器相关的数据交互的方法: function ReaderModel(){}
+    
+### 第四天
+    
+    数据层与UI渲染连调
+    function ReaderBaseFrame(contanier){}
+    
+    上下翻页功能事件绑定及优化
+    var prevChapter = function (UIcallback){}
+    var nextChapter = function (UIcallback) {}
+    服务端交互代码细节优化
 
 

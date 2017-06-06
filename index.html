@@ -162,7 +162,7 @@
     }
 
     /*点击屏幕显示顶部栏和底部栏样式设置*/
-    .article-action-mid{
+    .artical-action-mid{
         position: fixed;
         z-index: 10002;
         width: 100%;
@@ -192,7 +192,7 @@
 
         <!--主体内容-->
         <div id="fiction-container" class="m-read-content">
-            <h4>第一章 测试斗之力</h4>
+            <!--<h4>第一章 测试斗之力</h4>
             <p>“斗之力，三段！”</p>
             <p>望着测验魔石碑上面闪亮得甚至有些刺眼的五个大字，少年面无表情，唇角有着一抹自嘲，紧握的手掌，因为大力
                 ，而导致略微尖锐的指甲深深的刺进了掌心之中，带来一阵阵钻心的疼痛…</p>
@@ -214,7 +214,7 @@
             <p>听着测验人的喊声，一名少女快速的人群中跑出，少女刚刚出场，附近的议论声便是小了许多，一双双略微火热的
             目光，牢牢的锁定着少女的脸颊…</p>
             <p>少女年龄不过十四左右，虽然并算不上绝色，不过那张稚气未脱的小脸，却是蕴含着淡淡的妩媚，清纯与妩媚，矛
-                盾的集合，让得她成功的成为了全场瞩目的焦点…</p>
+                盾的集合，让得她成功的成为了全场瞩目的焦点…</p>-->
         </div>
 
         <!--内容区域底部的翻页按钮-->
@@ -276,7 +276,7 @@
 
     </div>
 
-    <srcipt src="lib/zepto.min.js"></srcipt>
+    <script src="lib/zepto.min.js"></script>
     <script>
         window.jQuery = $;
     </script>
@@ -286,25 +286,26 @@
         (function(){
             var Util =( function(){ //声明一个内部类
                 //封装本地存储
-                var prefix = 'html5_reader_'
+                var prefix = 'html5_reader_';
                 var StorageGetter = function(key){
                     return localStorage.getItem(prefix + key);
-                }
+                };
                 var StorageSetter = function(key, val){
                     return localStorage.setItem(prefix + key, val);
-                }
+                };
+                //获取章节内容
                 var getJSONP = function(url, callback){
-                    return $.json({
+                    return $.jsonp({
                         url: url,
                         cache: true,
                         callback: 'duokan_fiction_chapter',
-                        success: function(redult){
-                            var data = $.base64.decode(result);
+                        success: function(result){
+                            var data = $.base64.decode(result); //解码
                             var json = decodeURIComponent(escape(data));
-                            callback(data);
+                            callback(json);
                         }
-                    })
-                }
+                    });
+                };
                 return{
                     StorageGetter:StorageGetter,
                     StorageSetter:StorageSetter,
@@ -317,10 +318,12 @@
                 bottom_nav : $('.bottom_nav'),
                 font_container: $('.font-container'),
                 font_button: $('#font-button')
-            }
+            };
 
             var Win = $(window);
             var Doc = $(document);
+            var readerModel;
+            var readerUI;
             //字号改变事件
             var RootContainer = $('#fiction-container');
             var initFontSize = Util.StorageGetter('font_size');
@@ -331,32 +334,39 @@
             RootContainer.css('font-size', initFontSize);
 
             //代码层次分离
+            //todo整个项目的入口函数
            function main(){
-               //todo 整个项目的入口函数
-               var readerModel = ReaderModel();
-               readerModel.init();
+               readerModel = ReaderModel();
+               readerUI = ReaderBaseFrame(RootContainer);
+               readerModel.init(function (data) {
+                    readerUI(data);
+               });
                EventHandler();// 调用
            }
 
+           //实现和阅读器相关的数据交互的方法
            function ReaderModel(){
-                //todo 实现和阅读器相关的数据交互的方法
                 var Chapter_id;
-                var init = function(){
-                    getFictionInfo(function(){
-                        getCurChapterContent(Chapter_id, function(){
-                            //todo 
+                var ChapterTotal; //总章节数
+                var init = function (UIcallback) {
+                    getFictionInfo(function () {
+                        getCurChapterContent(Chapter_id, function (data) {
+                            UIcallback && UIcallback(data);
                         });
-                    })
-                }
+                    });
+                };
+                //获取章节信息
                 var getFictionInfo = function(callback){
-                    $.get('data/chapter.json',function(){
-                        //todo 获得章节信息之后的回调
+                    $.get('data/chapter.json',function(data){
+                        //todo获得章节信息之后的回调
                         Chapter_id = data.chapters[1].chapter_id;
+                        ChapterTotal = data.chapters.lengthl;
                         callback && callback();
                     },'json');
-                }
-                var getCurChapterContent = function(chapter_id){
-                    $.get('data/data' + chapter_id + '.json', function(){
+                };
+                //获取详情内容
+                var getCurChapterContent = function(chapter_id, callback){
+                    $.get('data/data' + chapter_id + '.json', function(data){
                         if(data.result == 0){
                             var url = data.jsonp;
                             Util.getJSONP(url, function(data){
@@ -364,21 +374,52 @@
                             });
                         }
                     },'json')
-                }
+                };
+                //上一页
+               var prevChapter = function (UIcallback) {
+                   Chapter_id = parseInt(Chapter_id,10);
+                   if(Chapter_id == 0){
+                       return;
+                   }
+                   Chapter_id -= 1;
+                   getCurChapterContent(Chapter_id,UIcallback);
+                   Util.StorageSetter('last_chapter_id', Chapter_id); //记录章节ID
+               }
+               //下一页
+               var nextChapter = function (UIcallback) {
+                   Chapter_id = parseInt(Chapter_id,10);
+                   if(Chapter_id == ChapterTotal){
+                       return;
+                   }
+                   Chapter_id += 1;
+                   getCurChapterContent(Chapter_id,UIcallback);
+                   Util.StorageSetter('last_chapter_id', Chapter_id); //记录章节ID
+               }
                 return {
-                    init: init
+                    init: init,
+                    prevChapter: prevChapter,
+                    nextChapter: nextChapter
                 }
-            }
-
-            function ReaderBaseFrame(){
-                //todo 渲染基本的UI结构
-            }
-
-            function EventHandler(){
-                //todo 交互的事件绑定
+           }
+            //渲染基本的UI结构
+           function ReaderBaseFrame(contanier){  //解析章节数据
+                function parseChapterData(jsonData) {
+                    var jsonObj = JSON.parse(jsonData);  //序列化
+                    var html = '<h4>' + jsonObj.t + '</h4>'; //标题
+                    for(var i=0; i<jsonObj.p.length; i++){
+                        html += "<p>" + jsonObj.p[i] + "</p>";
+                    }
+                    return html;
+                }
+                return function (data) {
+                    contanier.html(parseChapterData(data));
+                }
+           }
+           //交互的事件绑定
+           function EventHandler(){
                 $('#menu_button').click(function(){
                     location.href = "http://dushu.xiaomi.com/fiction/chapter/306450"
-                })
+                });
                 //点击中部显示隐藏事件
                 $('#action_mid').click(function(){
                     if(Dom.top_nav.css('display') == 'none'){
@@ -388,25 +429,25 @@
                         Dom.bottom_nav.hide();
                         Dom.top_nav.hide();
                         Dom.font_container.hide();    
-                        Dom.font_container.removeClass('current');
+                        Dom.font_button.removeClass('current');
                     }
                 });
 
-                //背景颜色改变
-               Dom.font_button.onclick(function(){
+               //背景颜色改变
+               Dom.font_button.click(function(){
                     if(Dom.font_container.css('dispaly') == 'none'){
                         Dom.font_container.show();
-                        Dom.font_container.addClass('current');
+                        Dom.font_button.addClass('current');
                     }else{
                         Dom.font_container.hide();    
-                        Dom.font_container.removeClass('current');                                            
+                        Dom.font_button.removeClass('current');
                     }
-                })
+               });
 
                 //白天/夜间模式切换
                 $('#night-button').click(function(){
-                    //todo 触发背景切换事件
-                })
+                    //todo触发背景切换事件
+                });
 
                 //字号大小事件绑定
                 $('#large-font').click(function(){
@@ -416,23 +457,34 @@
                     initFontSize += 1;
                     RootContainer.css('font-size', initFontSize);
                     Util.StorageSetter('font-size', initFontSize);
-                })
+                });
                 $('#samll-font').click(function(){
                     if(initFontSize < 12){
                         return;
                     }
                     initFontSize -= 1;
                     RootContainer.css('font-size', initFontSize);      
-                    Util.StorageSetter('font-size', initFontSize);                                  
-                })
+                    Util.StorageSetter('font-size', initFontSize);
+                });
 
                 //滚动时
-                Win.scroll(function(){
+                Win.scrollTop(function(){
                      Dom.bottom_nav.hide();
                      Dom.top_nav.hide();
                      Dom.font_container.hide();    
                      Dom.font_container.removeClass('current');
                 });
+
+               //上一页 事件绑定: 获取章节的翻页数据->把数据拿出来渲染
+               $('#prev_button').click(function () {
+                   readerModel.prevChapter();
+               });
+               //下一页
+               $('#next_button').click(function () {
+                   readerModel.nextChapter(function (data) {
+                       readerUI(data);
+                   });
+               });
             }
 
             main();
