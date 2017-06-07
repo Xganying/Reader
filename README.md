@@ -40,6 +40,19 @@ htmL5 + CSS实现阅读器的前端页面基本结构静态布局，主要：顶
     上下翻页功能事件绑定及优化
     var prevChapter = function (UIcallback){}
     var nextChapter = function (UIcallback) {}
+    
     服务端交互代码细节优化
+    
+### 第5天 
+   
+   学习ES6 + promise组织异步代码
+   
+    获取章节内容和详细信息：
+   
+    var getFictionInfoPromise =function () {}
+    var getCurChapterContentPromise = function (){}
+    
+    页面布局和交互代码的细节完善
+    
 
 
