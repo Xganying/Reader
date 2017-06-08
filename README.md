@@ -8,11 +8,11 @@
 
 ## 项目进度
 
-### 第一天
+### 第1天
 
 htmL5 + CSS实现阅读器的前端页面基本结构静态布局，主要：顶部栏 + 主体内容 + 底部栏 + 底部栏控制面板
 
-### 第二天
+### 第2天
 
 1.简单学习和使用zepto.js
 
@@ -26,13 +26,13 @@ htmL5 + CSS实现阅读器的前端页面基本结构静态布局，主要：顶
 
     点击阅读内容中部，显示/隐藏头部栏和底部栏  function EventHandler(){}
 
-### 第三天
+### 第3天
 
     页面前端交互代码开发：
 
     实现和阅读器相关的数据交互的方法: function ReaderModel(){}
     
-### 第四天
+### 第4天
     
     数据层与UI渲染连调
     function ReaderBaseFrame(contanier){}
@@ -52,7 +52,13 @@ htmL5 + CSS实现阅读器的前端页面基本结构静态布局，主要：顶
     var getFictionInfoPromise =function () {}
     var getCurChapterContentPromise = function (){}
     
-    页面布局和交互代码的细节完善
+    页面布局和交互代码的细节完善田野
+    
+### 第6天
+
+    完善页面布局，优化交互代码，基本实现阅读器的阅读界面功能。
+
+
     
 
 
