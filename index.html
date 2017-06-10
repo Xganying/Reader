@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app="app">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, minimal-ui">
@@ -31,8 +31,7 @@
             top:0;
         }
         .loading-icon{
-            margin: 0 auto;
-            margin-top: 50%;
+            margin: 50% auto;
             background: url(data:image/gif;base64,R0lGODlhGAAYAIAAAK2trTE6QiH/C05FVFNDQVBFMi4wAwEAAAAh+QQFDwABACwDAAkAEgAGAAACFIQReah7GRZ0r5lJWayb4ms5n7YUACH5BAkPAAEALAIABwATAAoAAAIbhB+pq4cMwwMR0lbZTTvL1WVdWI1e45BRqkIFACH5BAkPAAEALAMABwASAAoAAAIdjA+px63r4EtmylktyI/jYHkd+GkbOY5M2LQsUwAAIfkECQ8AAQAsAwAIABMACAAAAhqMjwfLrWyaBG/FCa8NOPPcbd8WUpo5Jeq5FAA7);
             width: 20px;
             height:20px;
@@ -64,7 +63,7 @@
             z-index: 9999;
             background: #000;
         }
-        .top-nav .top-nav-warp{
+        #top-nav .top-nav-wrap{
             position: relative;
             max-width: 900px;
             margin: 0 auto;
@@ -173,7 +172,7 @@
         padding-right: 20px;
         padding-left: 10px;
     }
-    .nav-pannel .bg-container{   /*设置背景选项样式*/
+    .bg-container{   /*设置背景选项样式*/
         position: relative;
         width:30px;
         height:30px;
@@ -183,7 +182,7 @@
         vertical-align: -14px;       /*设置圆圈垂直对齐*/
         margin-left: 14px;
     }
-    .nav-pannel .bg-container-current{
+    .bg-container-current{
         position: absolute;
         width: 30px;
         height: 30px;
@@ -327,12 +326,6 @@
     }
     .chapter-list li:nth-child(2n) {
         background-color: #e6e6e6;
-    }
-    .chapter-list .free {
-        float: right;
-    }
-    .free {
-        color: #459c3a;
     }
     .menu-mask{
         width: 100%;
@@ -485,6 +478,7 @@
     </script>
     <script src="js/jquery.base64.js"></script>
     <script src="js/jquery.jsonp.js"></script>
+    <!--suppress JSValidateTypes -->
     <script>
         (function(){
             'use strict'; //使用ES6语法
@@ -498,7 +492,7 @@
                     return localStorage.setItem(prefix + key, val);
                 };
                 //获取章节内容解密
-                var getJSONP = function(url, callback){
+                var getBJSONP = function(url, callback){
                     return $.jsonp({
                         url: url,
                         cache: true,
@@ -513,15 +507,17 @@
                 return{
                     StorageGetter:StorageGetter,
                     StorageSetter:StorageSetter,
-                    getJSONP: getJSONP
+                    getBJSONP: getBJSONP
                 }
             })();
 
             //获得阅读器内容的方法
             function ReaderModel(id, cid, onChange){
                 var Title = "";
-                var Chapter_id = cid;
+
                 var Fiction_id = id;
+                var Chapter_id = cid;
+
 
                 if (Util.StorageGetter(Fiction_id + 'last_chapter')) {
                     Chapter_id = Util.StorageGetter(Fiction_id + 'last_chapter');
@@ -547,7 +543,7 @@
                     $.get('data/data' + Chapter_id + '.json', function(data){
                         if(data.result == 0){
                             var url = data.jsonp;
-                            Util.getJSONP(url, function(data){
+                            Util.getBJSONP(url, function(data){
                                 $('#init_loading').hide();
                                 onChange && onChange(data);
                             });
@@ -601,8 +597,8 @@
                 return {
                     init: init,
                     go: gotoChapter,
-                    prevChapter: prevChapter,
-                    nextChapter: nextChapter,
+                    prev: prevChapter,
+                    next: nextChapter,
                     getChapter_id:function () {
                         return Chapter_id;
                     }
@@ -643,7 +639,7 @@
                var NightModel = false;
 
                //初始化字体大小
-               var InitFontSize;
+               var initFontSize;
 
                //DOM 节点的缓存
                var Dom = {
@@ -721,7 +717,8 @@
                         }
                         Dom.bg_container.append('<div class="bg-container" id="' + colorArr[i].id + '" data-font="' + colorArr[i].font + '"  data-bottomcolor="' + colorArr[i].bottomcolor + '" data-color="' + colorArr[i].value + '" style="background-color:"'+ colorArr[i].value + '"><div class="bg-container-current" style="display:"'+ display + '"></div><span style="display:none">' + colorArr[i].name + '</span></div>');
                     }
-                    RootContainer.css('min-height',$(window).height() - 100);
+
+                   RootContainer.css('min-height',$(window).height() - 100);
 
                    if(bottomcolor){
                        $('#bottom_tool_bar_ul').find('li').css('color', bottomcolor);
@@ -747,7 +744,7 @@
                    if(!initFontSize){
                        initFontSize = 18;
                    }
-                   RootContainer.css('font-size',InitFontSize);
+                   RootContainer.css('font-size',initFontSize);
 
                })();
 
@@ -764,7 +761,7 @@
                        }else{
                            $('#day_icon').show();
                            $('#night_icon').hide();
-                           $('#font_normal').trigger('click');
+                           $('#font_night').trigger('click');
                            NightModel = true;
                        }
                    });
@@ -827,16 +824,16 @@
                            return;
                        }
                        initFontSize += 1;
-                       RootContainer.css('font-size', initFontSize);
                        Util.StorageSetter('font-size', initFontSize);
+                       RootContainer.css('font-size', initFontSize);
                    });
                    $('#small-font').click(function(){
                        if(initFontSize < 12){
                            return;
                        }
                        initFontSize -= 1;
-                       RootContainer.css('font-size', initFontSize);
                        Util.StorageSetter('font-size', initFontSize);
+                       RootContainer.css('font-size', initFontSize);
                    });
 
                    var font_container = $('.font-container');
@@ -872,7 +869,7 @@
                        readerModel.next();
                    });
                    Dom.prev_button.click(function () {
-                       redderModel.prev();
+                       readerModel.prev();
                    });
 
                    //返回上级页面
