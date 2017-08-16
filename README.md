@@ -20,6 +20,8 @@ htmL5 + CSS实现页面基本结构静态布局，主要：顶部栏 + 主体内
 
 （轻量 + 快速 + 高效）
 
+学习文档地址：http://www.kancloud.cn/wangfupeng/zepto-design-srouce/173680
+
 2.页面前端交互代码开发（部分）: 
 
     点击阅读内容中部，显示/隐藏头部栏和底部栏  function EventHandler(){}
